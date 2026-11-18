@@ -1,0 +1,16 @@
+.dart_tool/
+build/
+.idea/
+*.iml
+.flutter-plugins*
+.packages
+pubspec.lock
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+android/.gradle/
+android/local.properties
+android/key.properties
+android/app/.cxx/
+*.jks
+*.keystore

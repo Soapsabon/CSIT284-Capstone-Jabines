@@ -1,0 +1,47 @@
+rules_version = '2';
+// DEMO-ONLY RULES for a 3-week academic prototype.
+// The admin PIN lives in the app, so Firestore cannot verify "who is admin".
+// To avoid permanent open write access, writes are schema-validated AND
+// expire on the date below. For production: add Firebase Auth and require
+// request.auth.token.admin == true for every write.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function demoWindowOpen() {
+      return request.time < timestamp.date(2026, 12, 31);
+    }
+
+    function validTeam() {
+      let d = request.resource.data;
+      return d.teamName is string && d.teamName.size() > 0 && d.teamName.size() <= 40
+        && d.wins is int && d.losses is int && d.points is int
+        && d.gamesPlayed is int && d.pointDifference is int;
+    }
+
+    function validMatch() {
+      let d = request.resource.data;
+      return d.status in ['upcoming', 'live', 'completed']
+        && d.scoreA is int && d.scoreA >= 0
+        && d.scoreB is int && d.scoreB >= 0
+        && d.teamAId is string && d.teamBId is string
+        && d.teamAId != d.teamBId
+        && d.venue is string && d.venue.size() > 0;
+    }
+
+    match /teams/{id} {
+      allow read: if true;
+      allow create, update: if demoWindowOpen() && validTeam();
+      allow delete: if demoWindowOpen();
+    }
+
+    match /matches/{id} {
+      allow read: if true;
+      allow create, update: if demoWindowOpen() && validMatch();
+      allow delete: if demoWindowOpen();
+    }
+
+    match /{other=**} {
+      allow read, write: if false;
+    }
+  }
+}
