@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         applicationId = "edu.cit.jabines.x3_intrams"
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
